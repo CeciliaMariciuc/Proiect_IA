@@ -16,7 +16,6 @@ def print_to_file(file, text):
     open(file, "w").write(text)
 
 
-
 def get_summary(text, percent, freqTable):
     """
     rezumatul general al unui text in functie de procent:
@@ -100,7 +99,7 @@ def get_sentences_value(text, target_word, freqTable, include=False):
             if word in sentence.lower():
                 if sentence in sentence_value:
                     score = 0
-                    if word == target_word:
+                    if word.lower() in target_word.lower():
                         score = 1000
                     elif word in context:
                         score = 500
@@ -158,13 +157,29 @@ def main(args):
             print("You can find the summary in the file with the same name")
         elif args[2] == "character":
             include = input("Include character?(False/True)")
+
             if include == "False":
                 include = False
-                percent = 20
             else:
                 include = True
-                percent = 15
             name = input("Character's name: ")
+
+            tags = procces.find_proper_nouns(tagged_text, words)
+            nouns = procces.summarize_text(tags, 100)
+            main_charac, secondary_charac = procces.get_characters(procces.get_nouns(nouns))
+            characters = main_charac + secondary_charac
+
+            # print(characters)
+            if name.lower() in characters:
+                character_importance = characters.index(name.lower()) + 1
+                if include:
+                    percent = 50 - character_importance * 5
+                else:
+                    percent = 10 + character_importance * 5
+            else:
+                percent = 20
+
+            print(percent)
             get_summary_character(text, name, percent, freqTable, include)
             print("You can find the summary in the file with the same name")
         else:
